@@ -1,7 +1,7 @@
 # 環境パイプライン
 
 ---
-_🌍 利用可能な言語_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md)
+_🌍 利用可能な言語_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md) |  [Español (Spanish)](README-es.md)
 > **注**: これは素晴らしいクラウドネイティブコミュニティの[🌟貢献者](https://github.com/salaboy/platforms-on-k8s/graphs/contributors)によってもたらされました！
 
 ---
