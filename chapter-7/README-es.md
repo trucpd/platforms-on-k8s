@@ -1,21 +1,20 @@
-# Capítulo 7 :: Shared Applications Concerns
+# Capítulo 7:: Preocupaciones Compartidas de Aplicaciones
 
 ---
-_🌍 Available in_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md) | [Español](README-es.md)
+_🌍 Disponible en: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md) | [Español](README-es.md)
 
 > **Nota:** Presentado por la fantástica comunidad
 > de [ 🌟 contribuidores](https://github.com/salaboy/platforms-on-k8s/graphs/contributors) cloud-native!
 
 ---
 
-En este tutorial paso a paso, veremos como usar [Dapr](https://dapr.io) para proporcionar APIs a nivel de Aplicación para resolver los problemas que la mayoría de las Aplicaciones Distribuidas tienen que resolver.
+En este tutorial paso a paso, veremos como usar [Dapr](https://dapr.io) para proporcionar API a nivel de Aplicación para resolver los problemas que la mayoría de las Aplicaciones Distribuidas tienen que resolver.
 
-Luego miraremos [OpenFeature](https://openfeature.dev), un proyecto que está hecho para estandarizar las banderas de características y así los equipos de Desarrollo puedan seguir lanzando nuevas funcionalidades y los stakeholders puedan decidir cuándo habilitar/desactivar estas características para sus clientes.
+Luego miraremos [OpenFeature](https://openfeature.dev), un proyecto que está hecho para estandarizar las _feature flags_ y así los equipos de Desarrollo puedan seguir lanzando nuevas funcionalidades y los stakeholders puedan decidir cuándo habilitar/desactivar estas características para sus clientes.
 
-Debido a que ambos proyectos están enfocados en proveer a los desarrolladores con nuevas API y herramientas que utilizar dentro del código de sus servicios, desplegaremos una nueva versión de la aplicación (`v2.0.0).
-encontrarás todos los cambios requeridos para esta nueva versión en la rama `v2.0.0` de este repositorio.
-Puedes comparar las diferencias entre las ramas aquí](https://github.com/salaboy/platforms-on-k8s/compare/v2.0.0).
-
+Debido a que ambos proyectos están enfocados en proveer a los desarrolladores con nuevas API y herramientas que utilizar dentro del código de sus servicios, desplegaremos una nueva versión de la aplicación (`v2.0.0`).
+Encontrarás todos los cambios requeridos para esta nueva versión en la rama `v2.0.0` de este repositorio.
+[Puedes comparar las diferencias entre las ramas aquí](https://github.com/salaboy/platforms-on-k8s/compare/v2.0.0).
 
 # Instalación
 
@@ -46,7 +45,7 @@ helm install conference oci://docker.io/salaboy/conference-app --version v2.0.0
 Esta versión del chart de Helm instala la misma infraestructura de la aplicación que la versión
 `v1.0.0` (PostgreSQL, Redis, y Kafka).
 Los servicios que interactúan con Redis y Kafka ahora usan las API de Dapr.
-Esta versión de la aplicación también añade banderas de características OpenFeature utilizando `flagd`.
+Esta versión de la aplicación también añade feature flags OpenFeature utilizando `flagd`.
 
 # API a nivel de aplicación con Dapr
 
@@ -179,19 +178,19 @@ Events:       <none>
 ```
 
 Como puedes ver,
-esta suscripción reenvía los eventos a la ruta `/api/new-events/` para que las aplicaciones Daps listadas
-en la sección `Scopes`, solo la aplicación `frontend`.
+esta suscripción reenvía los eventos a la ruta `/api/new-events/` para que las aplicaciones Dapr listadas
+en la sección `Scopes`.
 Solo la aplicación Frontend necesita exponer el endpoint para recibir eventos,
 en este caso el sidecar de Dapr (`daprd`)
 espera los mensajes entrantes en el componente PubSub llamado `conference-conference-pubsub` y reenvía todos los mensajes al endpoint de la Aplicación.
 
-Esta versión de la aplicación eliminar dependencias de la aplicación tales como el cliente de Kafka de todos los servicios y el cliente de Redis del servicio de Agenda.
+Esta versión de la aplicación elimina dependencias de la aplicación tales como el cliente de Kafka de todos los servicios y el cliente de Redis del servicio de Agenda.
 
 
 ![services without deps](imgs/conference-app-dapr-no-deps.png)
 
-Ademas de eliminar las dependencias y hacer los contenedores más pequeños,
-al consumir la API de los componentes Dapr, permitimos que el equipo de plataforma defina cómo se configurar esos componentes y sobre qué infraestructura.
+Además de eliminar las dependencias y hacer los contenedores más pequeños,
+al consumir la API de los componentes Dapr, permitimos que el equipo de plataformas defina cómo se configuran esos componentes y sobre qué infraestructura.
 Configurar la misma aplicación para usar servicios administrados de Google Cloud Platform como [Google PubSub](https://cloud.google.com/pubsub) o la [MemoryStore databases](https://cloud.google.com/memorystore) no requiere cambios en el código de la aplicación o agregar nuevas dependencias, solo se necesitan nuevas configuraciones de componentes de Dapr.
 
 ![in gcp](imgs/conference-app-dapr-and-gcp.png)
@@ -199,21 +198,17 @@ Configurar la misma aplicación para usar servicios administrados de Google Clou
 Finalmente, ya que todo se trata de permitir que los desarrolladores utilicen las API a nivel de aplicación, miremos cómo se ve desde la perspectiva del servicio.
 Como los servicios están escritos en Go, he decidido añadir la SDK de Dapr para Go (que es opcional).
 
-Cuando el servicio de Agenda quiere almacenar o leer datos del componente Statestore, puede utilizar el cliente Dapr para realizar estar operaciones, por ejemplo 
-
-Finally, because this is all about enabling developers with Application Level APIs, let's look at how this looks from the application's service perspective. Because the services are written in Go, I've decided to add the Dapr Go SDK (which is optional). 
-
-When the Agenda Service wants to store or read data from the Dapr Statestore component, it can use the Dapr Client to perform these operations, for example [reading values from the Statestore looks like this](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L136C2-L136C116): 
+Cuando el servicio de Agenda quiere almacenar o leer datos del componente Statestore, puede utilizar el cliente Dapr para realizar estar operaciones, por ejemplo:
 
 ```golang
 agendaItemsStateItem, err := s.APIClient.GetState(ctx, STATESTORE_NAME, fmt.Sprintf("%s-%s", TENANT_ID, KEY), nil)
 ```
 
-The `APIClient` reference is just a [Dapr Client instance, which was initialized here](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L397)
+La referencia `APIClient` es una [instancia del cliente Dapr, que se ha iniciado aquí](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L397)
 
-All the application needs to know is the Statestore name (`STATESTORE_NAME`) and the key (`KEY`) to locate the data that wants to be retrieved.
+Todo lo que la aplicación necesita saber es el nombre del componente Statestore (`STATESTORE_NAME`) y la clave (`KEY`) para localizar el dato que quiere recuperar.
 
-When the application wants to [store state into the Statestore it looks like this](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L197C2-L199C3):
+Cuando la aplicación necesita [almacenar un estado en la Statestore, se utiliza asi](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L197C2-L199C3):
 
 ```golang
 if err := s.APIClient.SaveState(ctx, STATESTORE_NAME, fmt.Sprintf("%s-%s", TENANT_ID, KEY), jsonData, nil); err != nil {
@@ -221,7 +216,8 @@ if err := s.APIClient.SaveState(ctx, STATESTORE_NAME, fmt.Sprintf("%s-%s", TENAN
 }
 ```  
 
-Finally, if the application code wants to [publish a new event to the PubSub component](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L225), it will look like this: 
+Finalmente,
+si la aplicación necesita [publicar un nuevo evento en el componente PubSub](https://github.com/salaboy/platforms-on-k8s/blob/v2.0.0/conference-application/agenda-service/agenda-service.go#L225), se utiliza asi:
 
 ```golang
 if err := s.APIClient.PublishEvent(ctx, PUBSUB_NAME, PUBSUB_TOPIC, eventJson); err != nil {
@@ -230,30 +226,37 @@ if err := s.APIClient.PublishEvent(ctx, PUBSUB_NAME, PUBSUB_TOPIC, eventJson); e
 
 ```
 
-As we have seen, Dapr provides Application-Level APIs for application developers to use regarding the programming language that they are using. These APIs abstract away the complexities of setting up and managing application infrastructure components, enabling platform teams to have more flexibility to focus on fine-tuning how applications will interact with them without pushing teams to change the application source code. 
+Como hemos visto, Dapr provee API de nivel de aplicación para que las usen los desarrolladores de aplicaciones, sin importar el lenguaje que utilicen.
+Estas API abstraen la complejidad de configurar y administrar componentes de infraestructura de la aplicación, permitiendo que los equipos tengan más flexibilidad para enfocarse en configurar cómo las aplicaciones interactúan con ellas sin que se requieran cambios en el código de la aplicación.
 
-Next, let's talk about feature flags. This topic involves not only developers but also enables product managers and roles closer to the business to decide when certain features should be exposed.
+Ahora, hablemos de feature flags.
+Este tópico involucra no solo a los desarrolladores, sino que permite a los administradores de producto y roles más cercanos a la empresa decidir cuándo y qué características deben ser expuestas.
 
+## Feature Flags para todos
 
-## Feature Flags for everyone
+El proyecto [OpenFeature](https://openfeature.dev/) tiene como objetivo estandarizar cómo consumir Feature Flags desde aplicaciones escritas en diferentes lenguajes.
 
-The [OpenFeature](https://openfeature.dev/) project aims to standardize how to consume Feature Flags from applications written in different languages. 
-
-In this short tutorial, we will look at how the Conference Application `v2.0.0` uses Open Feature and, more specifically, the `flagd` provider to enable feature flags across all application services. For this example, to keep it simple, I've used the `flagd` provider that allows us to define our feature flag configurations inside a Kubernetes `ConfigMap`.
+En este breve tutorial,
+miraremos cómo la aplicación de conferencias `v2.0.0` utiliza Open Feature y,
+más específicamente,
+el proveedor `flagd` para permitir el uso de feature flags en todos los servicios.
+Para este ejemplo, manteniendo la simplicidad, he utilizado el proveedor `flagd` que nos permite definir nuestra configuración de feature flag dentro de un `ConfigMap`de Kubernetes.
 
 ![openfeature](imgs/conference-app-openfeature.png)
 
-In the same way as Dapr APIs, the idea here is to have a consistent experience no matter which provider we have selected. If the platform team wants to switch providers, for example, LaunchDarkly or Split, there will be no need to change how features are fetched or evaluated. The platform team will be able to swap providers to whichever they think is best. 
+De la misma manera que las API de Dapr, la idea aquí es tener una experiencia consistente, sin importar cuál proveedor hemos elegido.
+Si el equipo de plataformas decide cambiar el proveedor, por ejemplo, LaunchDarkly o Split, no hará falta cambiar cómo se obtienen o evalúan los feature flags.
+El equipo de plataformas será capaz de cambiar proveedores a cualquiera que piensen que es el mejor.
+ 
+La versión `v2.0.0` crea un ConfigMap llamado `flag-configuration`que contiene la configuración de feature flags que utilizarán los servicios.
 
-`v2.0.0` created a ConfigMap called `flag-configuration` containing the Feature Flag that the application's services will use. 
-
-You can get the flag configuration json file included in the ConfigMap by running: 
+Puedes obtener el fichero json con la configuración de los feature flags incluido en el ConfigMap ejecutando:
 
 ```shell
 kubectl get cm flag-configuration -o go-template='{{index .data "flag-config.json"}}'
 ```
 
-You should see the following output: 
+Deberías ver algo similar a la siguiente salida:
 
 ```json
 {
@@ -299,18 +302,22 @@ You should see the following output:
 }
 ```
 
-There are three feature flags defined for this example: 
-- `debugEnabled` is a boolean flag that allows us to turn on and off the Debug tab in the back office of the application. This replaces the need for an environment variable that we used in `v1.0.0`. We can turn the debug section on and off without restarting the application frontend container.
-- `callForProposalsEnabled` This boolean flag allows us to disable the **Call for Proposals** section of the application. As conferences have a window to allow potential speakers to submit proposals, when that period is over, this section can be hidden away. Having to release a specific version to just turn off that section would be too complicated to manage, hence having a feature flag for this makes a lot of sense. We can make this change without the need to restart the application frontend container.
-- `eventsEnabled` is an object feature flag, this means that it contains a structure and allows teams to define complex configurations. In this case, I've defined different profiles of flags to configure which service can emit events (Events tab in the application back office). By default all services emit events, but by changing the `defaultVariant` value to `none` we can disable events for all services, without the need to restart any container.
+Existen 3 feature flags definidas para este ejemplo:
 
+- `debugEnabled` es una marca booleana que nos permite habilitar o deshabilitar la sección Debug en la sección Back Office de la aplicación. Esto reemplaza la necesidad de una variable de entorno que utilizábamos en `v1.0.0`. Podemos habilitar o deshabilitar la sección Debug sin reiniciar el contenedor de la aplicación frontend.
+- `callForProposalsEnabled` Es una marca booleana que nos permite deshabilitar la sección **Call for Proposals** de la aplicación. Como las conferencias tienen un período de tiempo para que los potenciales participantes envíen propuestas, cuando este período finaliza, podemos deshabilitar esta sección. Tener que lanzar una versión específica simplemente para habilitar o deshabilitar esa sección sería muy complicado de manejar, por lo tanto, tener una feature flag para ello tiene mucho sentido. Podemos hacer este cambio sin tener que reiniciar el contenedor de la aplicación frontend.
+- `eventsEnabled` es un objeto feature flag, lo que significa que contiene una estructura y permite a los equipos de plataformas definir configuraciones complejas. En este caso, hemos definido distintos perfiles de flags para configurar cual servicio puede emitir eventos (sección Eventos en la sección Back Office de la aplicación). Por defecto todos los servicios emiten eventos, pero cambiando el valor de `defaultVariant` a `none` podemos deshabilitar los eventos para todos los servicios, sin necesidad de reiniciar ningún contenedor.
 
-You can patch the ConfigMap to turn on the debug feature by following these steps. First, fetch the content of the `flag-config.json` file located inside the ConfigMap and store it locally.
+Puedes modificar el ConfigMap para habilitar la feature debug siguiendo estos pasos.
+Primero,
+obtén el contenido del fichero `flag-config.json` localizado dentro del ConfigMap
+y guárdalo localmente.
+
 ```shell
 kubectl get cm flag-configuration -o go-template='{{index .data "flag-config.json"}}' > flag-config.json
 ```
 
-Modify the content of this file, for example turn on the debug flag: 
+Modifica el contenido de este fichero, por ejemplo, activa la flag debug:
 
 ```json
 {
@@ -325,35 +332,44 @@ Modify the content of this file, for example turn on the debug flag:
     },
     ...
 ```
-Then patch the existing `ConfigMap`: 
+Luego, modifica el `ConfigMap` existente:
 
 ```shell
 kubectl create cm flag-configuration --from-file=flag-config.json=flag-config.json --dry-run=client -o yaml | kubectl patch cm flag-configuration --type merge --patch-file /dev/stdin
 ```
 
-After 20 seconds or so, you should see the Debug Tab in the application's back office section
+Después de unos 20 segundos, deberías ver la sección Debug en la sección Back Office de la aplicación.
 
 ![debug feature flag](imgs/feature-flag-debug-tab.png)
 
-You can see that feature flags are now also displayed in this tab. 
+Puedes ver que las feature flags ahora se muestran en esta sección
 
-Now submit a new proposal and approve it. You will see that in the `Events` tab, Events will be displayed. 
+Ahora envía una nueva propuesta y apruébala.
+Verás que se mostrarán los eventos en la sección `Events`.
 
 ![events for approved proposal](imgs/feature-flag-events-for-proposal.png)
 
+Si repites el proceso previo y cambias el valor de `eventsEnabled` a `defaultVariant` a `none`,
+todos los servicios dejarán de emitir eventos.
+Envía una nueva propuesta desde la interfaz de usuario de la aplicación y apruébala,
+luego revisa la sección `Events` para verificar que no se emitieron eventos.
+Recuerda que cuando cambias el `ConfigMap` `flag-configuration`,
+`flagd` necesita esperar alrededor de 10 segundos para refresacar el contenido del ConfigMap.
+Si tienes la sección Debug habilitada puedes refrescar esa pantalla hasta que veas que el valor ha cambiado. 
 
-If you repeat the previous process and change the `eventsEnabled` feature flag to `"defaultVariant": "none"`, all services will stop emitting events. Submit a new proposal from the application user interface and approve it, then check the `Events` tab to validate that no event has been emitted. Remember that when changing the `flag-configuration` ConfigMap, `flagd` needs to wait around 10 seconds to refresh the content of the ConfigMap. If you have the Debug tab enabled you can refresh that screen until you see that the value has changed. 
+**Notemos que esta feature flag es consumida por todos los servicios que evalúan la flag antes de enviar un evento.**
 
-**Notice that this feature flag is being consumed by all services that evaluate the flag before sending any event. **
-
-Finally, if you change the `callForProposalsEnabled` feature flag `"defaultVariant": "off"`, the Call for Proposal menu option will disappear from the application frontend. 
+Finalmente, si cambias la feature flag `callForProposalsEnabled` a `defaultVariant` a `off`, la sección **Call for Proposals** de la aplicación desaparecerá.
 
 ![no call for proposals feature flag](imgs/feature-flag-no-c4p.png)
 
+Mientras seguimos utilizando un `ConfigMap` para almacenar la configuración de feature flags, hemos logrado algunas mejoras importantes que permiten a los equipos ir más rápido.
+Los desarrolladores pueden continuar lanzando nuevas características a sus servicios de aplicación que luego los administradores de producto (o stakeholders) pueden deciidir cuando habilitarlas o deshabilitarlas.
+Los equipos de plataformas pueden definir donde se almacenarán las feature flags (en un servicio de almacenamiento o en el disco local).
+Al usar una especificación estándar, impulsada por una comunidad compuesta de proveedores de feature flags permite a nuestros equipos de desarrollo de aplicaciones hacer uso de las feature flags sin definir todos los aspectos técnicos requeridos para implementar estos mecanismos internamente. 
 
-While we are still using a `ConfigMap` to store the feature flags configurations we have achieved some important improvements that enable teams to go faster. Developers can keep releasing new features to their application services that then product managers (or stakeholders) can decide when to enable/disable. Platform Teams can define where the feature flags will be stored (a managed service or local storage). By using a standard specification driven by a community composed of Feature Flag vendors enables our application development teams to make use of feature flags without defining all the technical aspects required to implement these mechanisms in-house. 
+En este ejemplo, no hemos utilizado características más evanzadas para evaluar feature flags como [evaluación basada en el contexto](https://openfeature.dev/docs/reference/concepts/evaluation-context#providing-evaluation-context), que puede usar, por ejemplo, la geolocalización de un usuario para proveer valores diferentes para las mismas feature flags, o [tarjetas de evaluación](https://openfeature.dev/docs/reference/concepts/evaluation-context#targeting-key). Depende del lector el profundizar en las capacidades de OpenFeature así como qué otros [proveedores de feature flags](https://openfeature.dev/docs/reference/concepts/provider) están disponibles.
 
-In this example, we haven't used more advanced features to evaluate feature flags like [context-based evaluations](https://openfeature.dev/docs/reference/concepts/evaluation-context#providing-evaluation-context), which can use for example, the geo-location of the user to provide different values for the same feature flag, or [targetting keys](https://openfeature.dev/docs/reference/concepts/evaluation-context#targeting-key). It is up to the reader to go deeper into OpenFeature capabilities as well as which other [Open Feature flag providers](https://openfeature.dev/docs/reference/concepts/provider) are available.  
 
 ## Limpieza
 
@@ -375,9 +391,9 @@ La implementación actual solo elimina la entrada del menú "Convocatoria de Pro
 
 ## Resumen y Contribuir
 
-En este tutorial, hemos explorado las API a nivel de aplicación utilizando Dapr y las banderas de características utilizando OpenFeature.
+En este tutorial, hemos explorado las API a nivel de aplicación utilizando Dapr y las feature flags utilizando OpenFeature.
 Las API a nivel de aplicación, como las expuestas por los Componentes de Dapr, pueden ser aprovechadas por los equipos de desarrollo de aplicaciones, ya que la mayoría de las aplicaciones estarán interesadas en almacenar y leer estado, emitir y consumir eventos, y políticas de resiliencia para comunicaciones de servicio a servicio.
-Las banderas de características también pueden ayudar a acelerar el proceso de desarrollo y lanzamiento al permitir que los desarrolladores sigan lanzando funciones mientras que otros stakeholders deciden cuándo habilitar o deshabilitar estas funciones.
+Las feature flags también pueden ayudar a acelerar el proceso de desarrollo y lanzamiento al permitir que los desarrolladores sigan lanzando funciones mientras que otros stakeholders deciden cuándo habilitar o deshabilitar estas funciones.
 
 ¿Quieres mejorar este tutorial?
 Crea un Issue, envíame un mensaje en [Twitter](https://twitter.com/salaboy) o envía un [Pull Request](https://github.com/salaboy/platforms-on-k8s/pulls).
