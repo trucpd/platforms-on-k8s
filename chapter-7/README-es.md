@@ -351,16 +351,19 @@ kind delete clusters dev
 
 ## Próximos Pasos
 
-Un siguiente paso natural sería ejecutar la versión `v2.0.0` en la infraestructura provisionada por Crossplane, como hicimos en el Capítulo 5.
+Un siguiente paso natural sería ejecutar la versión `v2.0.0` en la infraestructura provisionada por Crossplane, como hicimos en el [Capítulo 5](../chapter-5/README-es.md).
 Esto puede ser gestionado por nuestro esqueleto de plataforma, que se encargará de configurar el gráfico de Helm de la Aplicación de Conferencias para conectarse a la infraestructura provisionada, conectando los recursos de Kubernetes entre sí.
 Si te interesa este tema, he escrito un artículo sobre por qué herramientas como Crossplane y Dapr están destinadas a trabajar juntas: [https://blog.crossplane.io/crossplane-and-dapr/](https://blog.crossplane.io/crossplane-and-dapr/).
 
 Otra extensión simple, pero muy útil del código de la aplicación sería asegurarse de que el Servicio de Convocatoria de Propuestas lea la bandera de características `callForProposalsEnabled` y devuelva errores significativos cuando esta función esté deshabilitada.
-La implementación actual solo elimina la entrada del menú "Convocatoria de Propuestas", lo que significa que si envías una solicitud `curl` a las APIs, la funcionalidad aún debería funcionar.
+La implementación actual solo elimina la entrada del menú "Convocatoria de Propuestas", lo que significa que si envías una solicitud `curl` a las API, la funcionalidad aún debería funcionar.
 
-## Sum up and Contribute
+## Resumen y Contribuir
 
-In this tutorial, we have looked into Application-level APIs using Dapr and Feature Flags using OpenFeature. Application-level APIs like the ones exposed by Dapr Components can be leveraged by application development teams, as most applications will be interested in storing and reading state, emitting, and consuming events and resiliency policies for service-to-service communications. Feature Flags can also help to speed up the development and release process by enabling developers to keep releasing features while other stakeholders can decide when these features are enabled or disabled. 
+En este tutorial, hemos explorado las API a nivel de aplicación utilizando Dapr y las banderas de características utilizando OpenFeature.
+Las API a nivel de aplicación, como las expuestas por los Componentes de Dapr, pueden ser aprovechadas por los equipos de desarrollo de aplicaciones, ya que la mayoría de las aplicaciones estarán interesadas en almacenar y leer estado, emitir y consumir eventos, y políticas de resiliencia para comunicaciones de servicio a servicio.
+Las banderas de características también pueden ayudar a acelerar el proceso de desarrollo y lanzamiento al permitir que los desarrolladores sigan lanzando funciones mientras que otros stakeholders deciden cuándo habilitar o deshabilitar estas funciones.
 
+¿Quieres mejorar este tutorial?
+Crea un Issue, envíame un mensaje en [Twitter](https://twitter.com/salaboy) o envía un [Pull Request](https://github.com/salaboy/platforms-on-k8s/pulls).
 
-Do you want to improve this tutorial? Create an issue, drop me a message on [Twitter](https://twitter.com/salaboy), or send a Pull Request.
