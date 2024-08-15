@@ -17,11 +17,12 @@ encontrarás todos los cambios requeridos para esta nueva versión en la rama `v
 Puedes comparar las diferencias entre las ramas aquí](https://github.com/salaboy/platforms-on-k8s/compare/v2.0.0).
 
 
-# Installation
+# Instalación
 
-You need a Kubernetes Cluster to install [Dapr](https://dapr.io) and `flagd` an [OpenFeature](https://openfeature.dev/) Provider. You can create one using Kubernetes KinD as we did in [Chapter 2](https://github.com/salaboy/platforms-on-k8s/blob/main/chapter-2/README.md#creating-a-local-cluster-with-kubernetes-kind)
+Necesitas un Clúster de Kubernetes para instalar [Dapr](https://dapr.io) y `flagd`, un proveedor de [OpenFeature](https://openfeature.dev/).
+Puedes crear uno utilizando Kubernetes KinD como vimos en el [Capítulo 2](../chapter-2/README-es.md#creando-un-clúster-local-con-kubernetes-kind)
 
-Then you can install Dapr into the cluster by running: 
+Luego puedes instalar Dapr en el clúster ejecutando:
 ```shell
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update
@@ -33,22 +34,23 @@ helm upgrade --install dapr dapr/dapr \
 
 ```
 
-Once Dapr is installed, we can install our Dapr-Enabled and FeatureFlag-Enabled versions of the application `v2.0.0`.
+Una vez que Dapr está instalado, podemos instalar nuestra versión `v2.0.0` de la aplicación habilitada con Dapr y FeatureFlag.
 
-# Running v2.0.0
-
-Now you can install v2.0.0 of the application by running: 
+# Ejecutando v2.0.0
+Ahora puedes instalar la versión `v2.0.0` de la aplicación ejecutando:
 
 ```shell
 helm install conference oci://docker.io/salaboy/conference-app --version v2.0.0
 ```
 
-This version of the Helm Chart installs the same application infrastructure as version `v1.0.0` (PostgreSQL, Redis, and Kafka). Services now interact with Redis and Kafka are now using Dapr APIs. This application version also adds OpenFeature Feature Flags using `flagd`.
+Esta versión del chart de Helm instala la misma infraestructura de la aplicación que la versión
+`v1.0.0` (PostgreSQL, Redis, y Kafka).
+Los servicios que interactúan con Redis y Kafka ahora usan las API de Dapr.
+Esta versión de la aplicación también añade banderas de características OpenFeature utilizando `flagd`.
 
-# Application Level APIs with Dapr
+# API a nivel de aplicación con Dapr
 
-In version `v2.0.0`, if you list the Application pods now, you will see that each service (agenda, c4p, frontend, and notifications) has a Dapr Sidecar (`daprd`) running alongside the service container (READY 2/2): 
-
+En la versión `v2.0.0`, si haces un listado de pods de la Aplicación, verás que cada servicio (agenda, c4p, frontend, y notificaciones) tiene un Dapr Sidecar (`daprd`) corriendo junto con el contenedor de servicio (READY 2/2):
 ```shell
 > kubectl get pods
 NAME                                                           READY   STATUS    RESTARTS      AGE
@@ -62,15 +64,16 @@ conference-redis-master-0                                      1/1     Running  
 flagd-6bbdc5d999-c42wk                                         1/1     Running   0             74s
 ```
 
-Notice the `flagd` container also running. We will cover this in the next section.
+Notemos que el contenedor `flagd` también se está ejecutando.
+Cubriremos esto en la siguiente sección.
 
-From the Dapr perspective the application looks like this: 
+Desde la perspectiva de Dapr, la aplicación se ve así: 
 
 ![conference-app-with-dapr](imgs/conference-app-with-dapr.png)
 
-The Dapr Sidecar exposes the Dapr Components APIs to enable the application to interact with   Statestore (Redis) and PubSub (Kafka) APIs. 
+El sidecar de Dapr exponer las API de los componentes Dapr para que los servicios puedan interactuar con las API de Statestore (Redis) y PubSub (Kafka).
 
-You can list Dapr Components by running: 
+Puedes listar los componentes Dapr ejecutando:
 
 ```shell
 > kubectl get components
@@ -79,7 +82,7 @@ conference-agenda-service-statestore   30m
 conference-conference-pubsub           30m
 ```
 
-You can describe each component to see its configurations:
+Puedes describir cada componente para ver sus configuraciones:
 ```shell
 > kubectl describe component conference-agenda-service-statestore
 Name:         conference-agenda-service-statestore
@@ -112,10 +115,9 @@ Events:      <none>
 
 ```
 
-You can see that the Statestore component is connecting to the Redis instance exposed by this service name `conference-redis-master.default.svc.cluster.local` and using the `conference-redis` secret to obtain the password to connect.
+Puedes observar que el componente Statestore conecta la instancia de Redis expuesta por este nombre de servicio`conference-redis-master.default.svc.cluster.local` usando el secreto `conference-redis` para obtener la contraseña para conectarse.
 
-Similarly, the PubSub Dapr Component that is connecting to Kafka: 
-
+De forma similar, el componente Dapr PubSub conecta con Kafka:
 ```shell
 kubectl describe component conference-conference-pubsub 
 Name:         conference-conference-pubsub
@@ -141,7 +143,7 @@ Spec:
 Events:     <none>
 ```
 
-The final piece of the puzzle that allows the Frontend service to receive events that are submitted to the PubSub component is the following Dapr Subscription: 
+La pieza final del rompecabezas que permite al servicio Frontend recibir eventos que se envían al componente Pubsub es la siguiente suscripción de Dapr: 
 
 ```shell
 > kubectl get subscription
@@ -149,7 +151,7 @@ NAME                               AGE
 conference-frontend-subscritpion   39m
 ```
 
-You can also describe this resource to see its configurations: 
+También puedes describir este recurso para mirar sus configuraciones:
 ```shell
 > kubectl describe subscription conference-frontend-subscritpion
 Name:         conference-frontend-subscritpion
@@ -176,9 +178,14 @@ Spec:
 Events:       <none>
 ```
 
-As you can see, this subscription forwards events to the route `/api/new-events/` for the Dapr applications listed in the `Scopes` section, only the `frontend` application. The Frontend Application only needs to expose the `/api/new-events/` endpoint to receive events, in this case the Dapr Sidecar (`daprd`) waits for incoming messages on the PubSub component called `conference-conference-pubsub` and forwards all messages to the Application Endpoint. 
+Como puedes ver,
+esta suscripción reenvía los eventos a la ruta `/api/new-events/` para que las aplicaciones Daps listadas
+en la sección `Scopes`, solo la aplicación `frontend`.
+Solo la aplicación Frontend necesita exponer el endpoint para recibir eventos,
+en este caso el sidecar de Dapr (`daprd`)
+espera los mensajes entrantes en el componente PubSub llamado `conference-conference-pubsub` y reenvía todos los mensajes al endpoint de la Aplicación.
 
-This version of the application removes application dependencies such as the Kafka Client from all services and the Redis Client from the Agenda Service. 
+Esta versión de la aplicación eliminar dependencias de la aplicación tales como el cliente de Kafka de todos los servicios y el cliente de Redis del servicio de Agenda.
 
 
 ![services without deps](imgs/conference-app-dapr-no-deps.png)
