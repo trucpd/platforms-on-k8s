@@ -115,7 +115,7 @@ Events:      <none>
 
 ```
 
-Puedes observar que el componente Statestore conecta la instancia de Redis expuesta por este nombre de servicio`conference-redis-master.default.svc.cluster.local` usando el secreto `conference-redis` para obtener la contraseña para conectarse.
+Puedes observar que el componente Statestore se conecta con la instancia de Redis expuesta por este nombre de servicio`conference-redis-master.default.svc.cluster.local` usando el secreto `conference-redis` para obtener la contraseña para conectarse.
 
 De forma similar, el componente Dapr PubSub conecta con Kafka:
 ```shell
@@ -190,10 +190,16 @@ Esta versión de la aplicación eliminar dependencias de la aplicación tales co
 
 ![services without deps](imgs/conference-app-dapr-no-deps.png)
 
-Besides removing the dependencies and making these containers smaller, by consuming the Dapr Components API, we enable the platform team to define how these components will be configured and against which infrastructural components. Configuring the same application to use Google Cloud Platform managed services such as [Google PubSub](https://cloud.google.com/pubsub) or the [MemoryStore databases](https://cloud.google.com/memorystore) will not require any changes in the application code or adding any new dependencies, just new Dapr Component configurations.
+Ademas de eliminar las dependencias y hacer los contenedores más pequeños,
+al consumir la API de los componentes Dapr, permitimos que el equipo de plataforma defina cómo se configurar esos componentes y sobre qué infraestructura.
+Configurar la misma aplicación para usar servicios administrados de Google Cloud Platform como [Google PubSub](https://cloud.google.com/pubsub) o la [MemoryStore databases](https://cloud.google.com/memorystore) no requiere cambios en el código de la aplicación o agregar nuevas dependencias, solo se necesitan nuevas configuraciones de componentes de Dapr.
 
 ![in gcp](imgs/conference-app-dapr-and-gcp.png)
 
+Finalmente, ya que todo se trata de permitir que los desarrolladores utilicen las API a nivel de aplicación, miremos cómo se ve desde la perspectiva del servicio.
+Como los servicios están escritos en Go, he decidido añadir la SDK de Dapr para Go (que es opcional).
+
+Cuando el servicio de Agenda quiere almacenar o leer datos del componente Statestore, puede utilizar el cliente Dapr para realizar estar operaciones, por ejemplo 
 
 Finally, because this is all about enabling developers with Application Level APIs, let's look at how this looks from the application's service perspective. Because the services are written in Go, I've decided to add the Dapr Go SDK (which is optional). 
 
