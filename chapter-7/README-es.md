@@ -349,11 +349,14 @@ kind delete clusters dev
 ```
 
 
-## Next Steps
+## Próximos Pasos
 
-A natural next step would be to run `v2.0.0` against infrastructure provisioned by Crossplane, as we did in Chapter 5. This can be managed by our Platform Walking skeleton, which will be in charge of configuring the Conference Application Helm chart to connect to the provisioned infrastructure by wiring Kubernetes resources together. If you are interested in this topic, I've written a blog post about why tools like Crossplane and Dapr are meant to work together: [https://blog.crossplane.io/crossplane-and-dapr/](https://blog.crossplane.io/crossplane-and-dapr/).
+Un siguiente paso natural sería ejecutar la versión `v2.0.0` en la infraestructura provisionada por Crossplane, como hicimos en el Capítulo 5.
+Esto puede ser gestionado por nuestro esqueleto de plataforma, que se encargará de configurar el gráfico de Helm de la Aplicación de Conferencias para conectarse a la infraestructura provisionada, conectando los recursos de Kubernetes entre sí.
+Si te interesa este tema, he escrito un artículo sobre por qué herramientas como Crossplane y Dapr están destinadas a trabajar juntas: [https://blog.crossplane.io/crossplane-and-dapr/](https://blog.crossplane.io/crossplane-and-dapr/).
 
-Another simple but very useful extension to the application code would be to make sure that the Call for Proposals Service reads the `callForProposalsEnabled` feature flag and returns meaningful errors when this feature is disabled. The current implementation only removes the `Call for Proposals` menu entry, meaning that if you send a `curl` request to the APIs, the functionality should still work. 
+Otra extensión simple, pero muy útil del código de la aplicación sería asegurarse de que el Servicio de Convocatoria de Propuestas lea la bandera de características `callForProposalsEnabled` y devuelva errores significativos cuando esta función esté deshabilitada.
+La implementación actual solo elimina la entrada del menú "Convocatoria de Propuestas", lo que significa que si envías una solicitud `curl` a las APIs, la funcionalidad aún debería funcionar.
 
 ## Sum up and Contribute
 
