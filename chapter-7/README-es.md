@@ -8,11 +8,13 @@ _🌍 Available in_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [
 
 ---
 
-In this step-by-step tutorial, we will look into using [Dapr](https://dapr.io) to provide Application-level APIs to solve everyday challenges that most Distributed Applications will face. 
+En este tutorial paso a paso, veremos como usar [Dapr](https://dapr.io) para proporcionar APIs a nivel de Aplicación para resolver los problemas que la mayoría de las Aplicaciones Distribuidas tienen que resolver.
 
-Then we will look at [OpenFeature](https://openfeature.dev), a project that aims to standardize Feature Flags so development teams can keep releasing new features and stakeholders can decide when to enable/disable these features for their customers. 
+Luego miraremos [OpenFeature](https://openfeature.dev), un proyecto que está hecho para estandarizar las banderas de características y así los equipos de Desarrollo puedan seguir lanzando nuevas funcionalidades y los stakeholders puedan decidir cuándo habilitar/desactivar estas características para sus clientes.
 
-Because both projects are focused on providing developers with new APIs and tools to use inside their service's code, we will deploy a new version of the application (`v2.0.0`). You can find all the changes required for this new version in the `v2.0.0` of this repository. [You can also compare the differences between the branches here](https://github.com/salaboy/platforms-on-k8s/compare/v2.0.0).
+Debido a que ambos proyectos están enfocados en proveer a los desarrolladores con nuevas API y herramientas que utilizar dentro del código de sus servicios, desplegaremos una nueva versión de la aplicación (`v2.0.0).
+encontrarás todos los cambios requeridos para esta nueva versión en la rama `v2.0.0` de este repositorio.
+Puedes comparar las diferencias entre las ramas aquí](https://github.com/salaboy/platforms-on-k8s/compare/v2.0.0).
 
 
 # Installation
