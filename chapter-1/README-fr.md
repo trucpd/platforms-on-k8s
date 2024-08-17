@@ -51,7 +51,7 @@ Ces événements sont envoyés puis capturés par une application frontend. Heur
 
 ![events](imgs/events-backoffice.png)
 
-## Résumé et Contribuez
+## Résumé et Contribuer
 
-Vous voulez améliorer ce tutoriel? Créez une [issue](https://github.com/salaboy/platforms-on-k8s/issues/new), envoyez-moi un message sur [Twitter](https://twitter.com/salaboy), ou soumettez une [Pull Request](https://github.com/salaboy/platforms-on-k8s/compare).
+Vous voulez améliorer ce tutoriel? Créez un [ticket](https://github.com/salaboy/platforms-on-k8s/issues/new), envoyez-moi un message sur [Twitter](https://twitter.com/salaboy), ou soumettez une [Pull Request](https://github.com/salaboy/platforms-on-k8s/compare).
 
