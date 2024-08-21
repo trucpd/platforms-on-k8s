@@ -1,14 +1,14 @@
 # Keptn Lifecycle Toolkit, out of the box Deployment Frequency
 
 ---
-_🌍 Available in_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md)
+_🌍 Available in_: [English](README.md) | [中文 (Chinese)](README-zh.md) | [日本語 (Japanese)](README-ja.md)| [Español](README-es.md)
 
 > **Note:** Brought to you by the fantastic cloud-native community's [ 🌟 contributors](https://github.com/salaboy/platforms-on-k8s/graphs/contributors)!
 
 ---
 
 
-On this short tutorial we explore the Keptn Lifecycle Toolkit to monitor, observe and react to our cloud native applications lifecycle events. 
+In this short tutorial, we explore the Keptn Lifecycle Toolkit to monitor, observe and react to our cloud native applications lifecycle events. 
 
 
 ## Installation
@@ -33,8 +33,8 @@ kubectl annotate ns default keptn.sh/lifecycle-toolkit="enabled"
 
 ## Keptn Lifecycle toolkit in action
 
-Keptn uses standard Kubernetes annotation to recognized and monitor our workloads. 
-The Kubernetes Deployments used by the Conference Application are annotated with the following annotations, for example the Agenda Service: 
+Keptn uses standard Kubernetes annotation to recognize and monitor our workloads. 
+The Kubernetes Deployments used by the Conference Application are annotated with the following annotations, for example, the Agenda Service: 
 
 ```shell
         app.kubernetes.io/name: agenda-service
@@ -44,7 +44,7 @@ The Kubernetes Deployments used by the Conference Application are annotated with
 
 These annotations allow tools to understand a bit more about our workloads, for example, in this case tools know that the service name is `agenda-service`. We can use the `app.kubernetes.io/part-of` to aggregate multiple services to be part of the same applicaiton. For this example, we wanted to keep each service as a separate entity so we can monitor each individually. 
 
-On this example we will be also using a KeptnTask, that enable us to perform pre and post deployment tasks. You can deploy the following extremely simple example `KeptnTaskDefinition`:
+In this example, we will be also using a KeptnTask that enables us to perform pre- and post-deployment tasks. You can deploy the following extremely simple example `KeptnTaskDefinition`:
 
 ```yaml
 apiVersion: lifecycle.keptn.sh/v1alpha3
@@ -61,7 +61,7 @@ spec:
 
 ```
 
-As you can see this task is only printing the context from its execution, but here is where you can build any integration with other projects or call external systems. If you look at the Keptn examples, you will find KeptnTaskDefinition to connect for example to Slack, run load tests or to validate that deployments are working as expected after being updated. These tasks uses [Deno](https://deno.land/), a secure JavaScript runtime with Typescript supported out-of-the-box, Python 3 or directly a container image. 
+As you can see this task is only printing the context from its execution, but here is where you can build any integration with other projects or call external systems. If you look at the Keptn examples, you will find KeptnTaskDefinition to connect, for example, to Slack, run load tests or to validate that deployments are working as expected after being updated. These tasks use [Deno](https://deno.land/), a secure JavaScript runtime with Typescript supported out-of-the-box, Python 3 or directly a container image. 
 
 By running: 
 
@@ -69,7 +69,7 @@ By running:
 kubectl apply -f keptntask.yaml
 ```
 
-KeptnTaskDefinitions allow Platform Teams to create reusable tasks that can be hooked into Pre/Post deployment hooks of our applications. By adding the following annotation to our workloads (deployments in this case), Keptn will execute the `stdout-notification` automatically, in this case after performing the deployment (and after any update): 
+KeptnTaskDefinitions allow Platform Teams to create reusable tasks that can be hooked into Pre-/ Post-deployment hooks of our applications. By adding the following annotation to our workloads (deployments in this case), Keptn will execute the `stdout-notification` automatically, in this case after performing the deployment (and after any update): 
 
 ```shell
   keptn.sh/post-deployment-tasks: stdout-notification
@@ -103,9 +103,9 @@ Let's now deploy the Conference Application as we did in Chapter 2:
 helm install conference oci://registry-1.docker.io/salaboy/conference-app --version v1.0.0
 ```
 
-Check the both Jaeger and Grafana Keptn Dashboards, as by default Keptn Workloads will track the deployment frequency. 
+Check both Jaeger and Grafana Keptn Dashboards, as by default, Keptn Workloads will track the deployment frequency. 
 
-In Grafana go to `Dashboards` -> `Keptn Applications`.  You will see a drop down that allows you to select the different applications services. Check the Notifications Service. Because we have only deployed the first version of the deployment, there is not much to see, but the dashboard will become more interesting after we release new versions of our services.
+In Grafana go to `Dashboards` -> `Keptn Applications`.  You will see a drop-down that allows you to select the different applications services. Check the Notifications Service. Because we’ve only deployed the first version of the deployment, there is not much to see, but the dashboard will become more interesting after we release new versions of our services.
 
 For example, edit the notifications-service deployment and update the `app.kubernetes.io/version` annotation to have the value `v1.1.0` and update the tag used for the container image to be `v1.1.0`
 
@@ -113,16 +113,16 @@ For example, edit the notifications-service deployment and update the `app.kuber
 kubectl edit deploy conference-notifications-service-deployment
 ```
 
-After you performed the changes, and the new version is up and running, check the dashboards again. 
-In Grafana you will see we are on the second successful deployment, that the average between deployments was 5.83 minutes in my environment, and that `v1.0.0` took 641s while `v1.1.0` took only 40s. There is definitely room for improvement there. 
+After you perform the changes, and the new version is up and running, check the dashboards again. 
+In Grafana, you will see we’re on the second successful deployment, that the average between deployments was 5.83 minutes in my environment, and that `v1.0.0` took 641s while `v1.1.0` took only 40s. There is definitely room for improvement there. 
 
 ![grafana](../imgs/grafana-notificatons-service-v1.1.0.png)
 
-If you look at the traces in Jaeger, you will see that the `lifecycle-operator` one of the core components in Keptn is monitoring our deployment resources and performing lifecycle operations, like for example calling pre and post deployments tasks. 
+If you look at the traces in Jaeger, you will see that the `lifecycle-operator` one of the core components in Keptn is monitoring our deployment resources and performing lifecycle operations, like, for example, calling pre- and post-deployments tasks. 
 
 ![jager](../imgs/jaeger-notifications-service-v1.1.0.png)
 
-These tasks are executed as Kubernetes Jobs in the same namespace where the workloads are running. You can take a look at the logs from this tasks by tailing the jobs pod's logs. 
+These tasks are executed as Kubernetes Jobs in the same namespace where the workloads are running. You can take a look at the logs from these tasks by tailing the job pod's logs. 
 
 ```shell
 kubectl get jobs
@@ -147,7 +147,7 @@ Keptn Task Executed with context:
 
 ## Next steps
 
-I strongly recommend you to get more familiar with Keptn Lifecycle Toolkit features and functionalities as what we have seen in this short tutorial are just the basics. Check the concept of [KeptnApplication](https://lifecycle.keptn.sh/docs/concepts/apps/) for more control on how your services are deployed, as Keptn allows you to define fine-grained rules about which services and which versions are allowed to be deployed. 
+I strongly recommend you to get more familiar with Keptn Lifecycle Toolkit features and functionalities as what we’ve seen in this short tutorial are just the basics. Check the concept of [KeptnApplication](https://lifecycle.keptn.sh/docs/concepts/apps/) for more control on how your services are deployed, as Keptn allows you to define fine-grained rules about which services and which versions are allowed to be deployed. 
 
-By grouping multiple services as part of the same Kubernetes Application using the `app.kubernetes.io/part-of` annotation, you can perform pre and post actions on a group of services, allowing you to validate that not only individual services are working as expected but the whole set is. 
+By grouping multiple services as part of the same Kubernetes Application using the `app.kubernetes.io/part-of` annotation, you can perform pre- and post-actions on a group of services, allowing you to validate that not only individual services are working as expected but the whole set is. 
 
